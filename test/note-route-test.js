@@ -21,17 +21,49 @@ describe('testing route /note', function(){
         request.post('localhost:3000/note')
         .send({text: 'test note'})
         .end((err, res) => {
-          console.error('err', res.body);
-          this.note = res.body;
-          console.log(this.note);
+          this.original = res.body;
+          request.get('http://localhost:3000/note?id=' + res.body.id)
+          .end((err, res) => {
+            this.res = res;
+            done();
+          });
+        });
+      });
+
+      describe('with query string', () => {
+        it('should return status 200', (done) => {
+          expect(this.res.status).to.equal(200);
+          done();
+        });
+
+        it('should return a note object', (done) => {
+          expect(this.res.body.text).to.equal('test note');
+          expect(this.res.body.timestamp).to.equal(this.original.timestamp);
+          expect(this.res.body.id).to.equal(this.original.id);
+          expect(this.res.body.upVotes).to.equal(0);
           done();
         });
       });
 
-      it('should return status 200', function(done){
-        console.log('');
-        done();
-      });
+      describe('with no query string', function(){
+        before((done) => {
+          request.get('http://localhost:3000/note')
+          .end((err, res) => {
+            this.res = res;
+            done();
+          });
+        });
+
+        it('should return status 200', (done) => {
+          expect(this.res.status).to.equal(404);
+          done();
+        });
+
+        it('should return "not found"', (done) => {
+          expect(this.res.text).to.equal('"not found"');
+          done();
+        });
+      })
     });
   });
 });
