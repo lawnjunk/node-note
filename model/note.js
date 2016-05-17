@@ -1,8 +1,7 @@
 const uuid = require('node-uuid');
 
-const Note = module.exports = function(text, category){
+const Note = module.exports = function(text){
   this.id = uuid.v1();
-  this.category = category;
   this.text = text;
   this.timestamp = new Date();
   this.upVotes = 0;
