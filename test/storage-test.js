@@ -1,7 +1,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const rimraf = require('rimraf');
+const del = require('del');
 const Storage = require('../lib/storage.js');
 const dataDir = process.env.DATA_DIR || `${__dirname}/../data`;
 const storage = new Storage(dataDir);
@@ -9,10 +9,12 @@ const item = { id: 123456, content: 'test item', timestamp: new Date() };
 
 describe('testing module storage', function(){
   after((done) => {
-    rimraf(`${dataDir}/note`, function(err){
-      if (err) console.error(err);
+    del([`${dataDir}/note/*`, `${dataDir}/note`]).then(() => {
       done();
-    });
+    }).catch((err) => {
+      console.error(err);
+      done();
+    });;
   });
 
   describe('testing method itemPath',function(){
@@ -36,7 +38,7 @@ describe('testing module storage', function(){
     });
   });
 
-  describe('testing method getItem', function(){
+  describe('testing method fetchItem', function(){
     before((done) => {
       storage.fetchItem('note', item.id).then((result) => {
         this.result = result;
