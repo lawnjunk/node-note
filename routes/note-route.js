@@ -2,12 +2,13 @@
 
 const response = require('../lib/response.js');
 const Note = require('../model/note.js');
+const debug = require('debug')('note-route')
 
 var notes = {};
 
 module.exports = function(router){
   router.get('/note', function(req, res){
-    console.log('HIT ROUTE: GET /note');
+    debug('HIT ROUTE: GET /note');
     var note = notes[req.url.query.id];
     if(note){
       return response(200, note)(req, res);
@@ -18,13 +19,13 @@ module.exports = function(router){
     response(200, Object.keys(notes))(req, res);
   })
   .post('/note', function(req, res){
-    console.log('HIT ROUTE: POST /note');
+    debug('HIT ROUTE: POST /note');
     var note = new Note(req.body.text);
     notes[note.id] = note;
     response(200, note)(req, res);
   })
   .put('/note', function(req, res){
-    console.log('HIT ROUTE: PUT /note');
+    debug('HIT ROUTE: PUT /note');
     var note = notes[req.body.id];
     if(note){
       note.text = req.body.text;
@@ -33,7 +34,7 @@ module.exports = function(router){
     response(404, 'not found')(req,res);
   })
   .delete('/note', function(req, res){
-    console.log('HIT ROUTE: DELETE /note');
+    debug('HIT ROUTE: DELETE /note');
     var note = notes[req.body.id];
     if(note){
       delete notes[req.body.id];

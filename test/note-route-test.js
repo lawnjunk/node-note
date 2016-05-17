@@ -2,8 +2,25 @@
 
 const expect = require('chai').expect;
 const request = require('superagent');
+const server = require('../server');
 
 describe('testing route /note', function(){
+  before((done) => {
+    if (!server.isRunning){
+      server.listen(3000, function(){
+        done();
+      });
+      return;
+    }
+    done();
+  });
+
+  after((done) => {
+    server.close(function(){
+      done();
+    });
+  });
+
   describe('testing method GET', function(){
     describe('with no data on server', function(){
       it('should return 404 not found', function(done){

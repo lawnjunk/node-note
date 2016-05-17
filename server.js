@@ -9,7 +9,9 @@ const router = new Router();
 
 noteRoute(router);
 
-const server = http.createServer(router.route());
+const server = module.exports = http.createServer(router.route());
+
 server.listen(port, function(){
+  server.isRunning = true;
   console.log('server up :::', port);
 });
