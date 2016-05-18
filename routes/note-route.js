@@ -6,23 +6,28 @@ const debug = require('debug')('note-route')
 
 var notes = {};
 
-module.exports = function(router){
+
+module.exports = function(router, storage){
   router.get('/note', function(req, res){
     debug('HIT ROUTE: GET /note');
     var note = notes[req.url.query.id];
-    if(note){
-      return response(200, note)(req, res);
-    }
-    response(404, 'not found')(req,res);
+    storage.fetchItem('note', req.url.query.id).then((note)=>{
+      response(200, note)(req, res);
+    }).catch((err) => {
+      console.error(err);
+      response(404, 'not found')(req,res);
+    });;
   })
   .get('/note/all', function(req,res){
     response(200, Object.keys(notes))(req, res);
   })
   .post('/note', function(req, res){
     debug('HIT ROUTE: POST /note');
-    var note = new Note(req.body.text);
-    notes[note.id] = note;
-    response(200, note)(req, res);
+    storage.setItem('note', new Note(req.body.text)).then((note) => {
+      response(200, note)(req, res);
+    }).catch((err) => {
+      response(500, 'internal server error')(req,res);
+    });
   })
   .put('/note', function(req, res){
     debug('HIT ROUTE: PUT /note');
